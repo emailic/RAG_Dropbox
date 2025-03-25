@@ -121,23 +121,31 @@ if __name__ == "__main__":
     index = initialize_pinecone()
     #clear_pinecone_index(index)
 
-    pdfs = {
-        "Caterpillar 3500": "Caterpillar-3500-generator-sets-operation-and-maintenance-manual.pdf",
-        "Waukesha VGF": "Waukesha_VGF_f18g.pdf"
-    }
-
     print(f"Using index: {INDEX_NAME}")
-    docs = [] #not necessary, using it for testing the script without burning OpenAI's credits on embeddings
-    
-    for manual, pdf_path in pdfs.items():
-        text_chunks = extract_text_from_pdf(pdf_path)
+    doc_text= list()
+
+    docs = {
+        #"Caterpillar 3500": "Caterpillar-3500-generator-sets-operation-and-maintenance-manual.pdf",
+         "Waukesha VGF": "Waukesha_VGF_f18g.pdf",
+        # "Presentation Example": "example.pptx",
+        # "Word Document Example": "example.docx"
+    }    
+    for title, file_path in docs.items():
+        if file_path.endswith(".pdf"):
+            text_chunks = extract_text_from_pdf(file_path)
+        elif file_path.endswith(".pptx"):
+            text_chunks = extract_text_from_pptx(file_path)
+        elif file_path.endswith(".docx"):
+            text_chunks = extract_text_from_docx(file_path)
+        else:
+            continue
         
-        for text, page in tqdm(text_chunks, desc=f"Indexing {manual}"):
+        for text, page in tqdm(text_chunks, desc=f"Indexing {title}"):
             #embedding = client.embeddings.create(input=text, model="text-embedding-3-small")
             #vector = embedding.data[0].embedding
-            metadata = {"source": manual, "page": page}
+            metadata = {"source": title, "page": page}
             #index.upsert(vectors=[(f"doc_{manual}_page_{page}", vector, metadata)])
-            docs.append((text, manual, page))
-        print(docs)
+            doc_text.append((text, title, page))
+        print("DOCSSSSSS", doc_text)
     
     print("Manuals chunked, vectorized, and upserted into Pinecone database.")
