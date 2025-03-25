@@ -60,7 +60,7 @@ def extract_text_from_pdf(pdf_path):
     for i, page in enumerate(reader.pages):
         text = page.extract_text()
         if text:
-             text_chunks.append((text, i + 1))
+             text_chunks.append((text))
 
     # Caterpillar manual cant be read, likely because it is scanned. Thus we extract text from images:
     if len(text_chunks)==0:
@@ -69,8 +69,9 @@ def extract_text_from_pdf(pdf_path):
         for i, img in tqdm(enumerate(images), desc = "Extracting text from images"):
             text = pytesseract.image_to_string(img)
             if text:
-                text_chunks.append((text, i + 1)) 
-    return text_chunks
+                text_chunks.append((text)) 
+    corpus_string = "".join(text_chunks)
+    return  corpus_string
 
 def extract_text_from_pptx(pptx_path):
     """Extract text from PowerPoint (.pptx), using OCR if necessary."""
@@ -109,6 +110,8 @@ def extract_text_from_docx(docx_path):
                 text_chunks.append((text, i + 1))
         return text_chunks
     
+# TODO: Write chunking function.
+    
 def convert_pptx_to_images(pptx_path):
     """Convert PowerPoint slides to images."""
     return []  # Implement image extraction from PPTX slides if needed
@@ -140,12 +143,12 @@ if __name__ == "__main__":
         else:
             continue
         
-        for text, page in tqdm(text_chunks, desc=f"Indexing {title}"):
+        for text in tqdm([text_chunks], desc=f"Indexing {title}"):
             #embedding = client.embeddings.create(input=text, model="text-embedding-3-small")
             #vector = embedding.data[0].embedding
-            metadata = {"source": title, "page": page}
+            metadata = {"source": title}
             #index.upsert(vectors=[(f"doc_{manual}_page_{page}", vector, metadata)])
-            doc_text.append((text, title, page))
+            doc_text.append((text, title))
         print("DOCSSSSSS", doc_text)
     
     print("Manuals chunked, vectorized, and upserted into Pinecone database.")
