@@ -5,7 +5,7 @@ from vector_db import query_document
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def generate_response(query: str, context: str) -> str:
+def generate_response(query: str, context: str) -> str | None:
     """Generate answer using OpenAI based on retrieved context"""
     prompt = f"""Use the following context to answer the question. 
     If you don't know the answer, say you don't know.
@@ -15,16 +15,16 @@ def generate_response(query: str, context: str) -> str:
     Question: {query}
     Answer:"""
     
-    # response = client.chat.completions.create(
-    #     model="gpt-3.5-turbo",
-    #     messages=[
-    #         {"role": "system", "content": "You are a helpful assistant."},
-    #         {"role": "user", "content": prompt}
-    #     ],
-    #     temperature=0
-    # )
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0
+    )
     
-    return f"This is a mock response, query: {query}, context: {context}" #response.choices[0].message.content
+    return response.choices[0].message.content
 
 def process_query(document_name: str, query: str) -> Dict:
     """Run vector search of a query against a specific document and generate response"""
@@ -43,3 +43,5 @@ def process_query(document_name: str, query: str) -> Dict:
         "source_document": document_name,
         "relevant_chunks": chunks
     }
+
+#print(process_query("Caterpillar-3500-generator-sets-operation-and-maintenance-manual.pdf", "what kind of macine is this?"))

@@ -42,13 +42,13 @@ def process_and_store_document(document_name: str, file_path: str):
 
     # Extract text
     logger.info("Extracting text from PDF...")
-    texts, page_numbers = extract_text_from_pdf(file_path)
-    logger.info(f"Extracted text from {len(texts)} pages")
+    corpus = extract_text_from_pdf(file_path)
+    logger.info(f"Extracted text from {document_name}.")
 
     
     # Chunk text
     logger.info("Chunking text...")
-    chunks = chunk_text(texts, page_numbers)
+    chunks = chunk_text(corpus)
     logger.info(f"Created {len(chunks)} chunks")
     
     # Generate embeddings and store
@@ -58,17 +58,17 @@ def process_and_store_document(document_name: str, file_path: str):
     logger.info("Generating embeddings...")
     for chunk in chunks:
         # Generate embedding
-        # embedding = client.embeddings.create(
-        #     input=chunk["text"],
-        #     model="text-embedding-3-small"
-        # ).data[0].embedding
-        embedding = [0.123] * 1536 #mock embedding
+        embedding = client.embeddings.create(
+            input=chunk["text"],
+            model="text-embedding-3-small"
+        ).data[0].embedding
+
+        # embedding = [0.123] * 1536 #mock embedding
         
         # Prepare vector
-        vector_id = f"{document_name}_page_{chunk['page']}_chunk_{chunk['chunk_id']}"
+        vector_id = f"{document_name}_chunk_{chunk['chunk_id']}"
         metadata = {
             "text": chunk["text"],
-            "page": chunk["page"],
             "document": document_name
         }
         
@@ -79,7 +79,7 @@ def process_and_store_document(document_name: str, file_path: str):
 
     for i in range(0, len(vectors), 100):  # 100 vectors per upsert
         batch = vectors[i:i+100]
-        #index.upsert(vectors=batch, namespace=document_name)
+        index.upsert(vectors=batch, namespace=document_name)
 
 def query_document(document_name: str, query: str, top_k: int = 3) -> List[Dict]:
     """Query a specific document namespace in the vector DB"""
@@ -87,12 +87,12 @@ def query_document(document_name: str, query: str, top_k: int = 3) -> List[Dict]
     
     # Generate query embedding
 
-    # embedding = client.embeddings.create(
-    #     input=query,
-    #     model="text-embedding-3-small"
-    # ).data[0].embedding
+    embedding = client.embeddings.create(
+        input=query,
+        model="text-embedding-3-small"
+    ).data[0].embedding
 
-    embedding = [0.123456789] * 1536 #mock embedding
+    # embedding = [0.123456789] * 1536 #mock embedding
     
     # Query the specific document namespace
     results = index.query(
@@ -105,6 +105,7 @@ def query_document(document_name: str, query: str, top_k: int = 3) -> List[Dict]
     # Format results
     return [{
         "text": match.metadata["text"],
-        "page": match.metadata["page"],
         "score": match.score
     } for match in results.matches]
+
+#print (query_document("Caterpillar-3500-generator-sets-operation-and-maintenance-manual.pdf", "what kind of machine is this?"))
