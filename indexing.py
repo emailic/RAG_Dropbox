@@ -9,10 +9,14 @@ from docx import Document
 import pytesseract
 import pdf2image
 from tqdm import tqdm
+import dropbox
+import requests
 
 load_dotenv()  # Load environment variables from .env
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
+DROPBOX_ACCESS_TOKEN = os.getenv("DROPBOX_ACCESS_TOKEN")
+#print (DROPBOX_ACCESS_TOKEN)
 INDEX_NAME = "dropbox-rag"
 PINECONE_CLOUD = "aws"
 PINECONE_REGION = "us-east-1"
@@ -51,6 +55,15 @@ def clear_pinecone_index(index):
     else:
         print("Pinecone index is already empty. Nothing to delete.")
 
+def download_file_from_dropbox(dropbox_path, local_path):
+    """Download a file from Dropbox to a local directory"""
+    dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
+    
+    #try:
+    dbx.files_download_to_file(local_path, dropbox_path)
+    print(f"Downloaded {dropbox_path} to {local_path}")
+    # except dropbox.exceptions.ApiError as e:
+    #     print(f"Error downloading {dropbox_path}: {e}")
 
 
 def extract_text_from_pdf(pdf_path):
@@ -60,7 +73,7 @@ def extract_text_from_pdf(pdf_path):
     for i, page in enumerate(reader.pages):
         text = page.extract_text()
         if text:
-             text_chunks.append((text, i + 1))
+             text_chunks.append((text))
 
     # Caterpillar manual cant be read, likely because it is scanned. Thus we extract text from images:
     if len(text_chunks)==0:
@@ -69,8 +82,9 @@ def extract_text_from_pdf(pdf_path):
         for i, img in tqdm(enumerate(images), desc = "Extracting text from images"):
             text = pytesseract.image_to_string(img)
             if text:
-                text_chunks.append((text, i + 1)) 
-    return text_chunks
+                text_chunks.append((text)) 
+    corpus_string = "".join(text_chunks)
+    return  corpus_string
 
 def extract_text_from_pptx(pptx_path):
     """Extract text from PowerPoint (.pptx), using OCR if necessary."""
@@ -109,6 +123,8 @@ def extract_text_from_docx(docx_path):
                 text_chunks.append((text, i + 1))
         return text_chunks
     
+# TODO: Write chunking function.
+    
 def convert_pptx_to_images(pptx_path):
     """Convert PowerPoint slides to images."""
     return []  # Implement image extraction from PPTX slides if needed
@@ -121,23 +137,38 @@ if __name__ == "__main__":
     index = initialize_pinecone()
     #clear_pinecone_index(index)
 
-    pdfs = {
-        "Caterpillar 3500": "Caterpillar-3500-generator-sets-operation-and-maintenance-manual.pdf",
-        "Waukesha VGF": "Waukesha_VGF_f18g.pdf"
-    }
-
     print(f"Using index: {INDEX_NAME}")
-    docs = [] #not necessary, using it for testing the script without burning OpenAI's credits on embeddings
-    
-    for manual, pdf_path in pdfs.items():
-        text_chunks = extract_text_from_pdf(pdf_path)
+    doc_text= list()
+
+
+    docs = {
+        "Caterpillar 3500": ("/Caterpillar-3500-generator-sets-operation-and-maintenance-manual.pdf", "Caterpillar-3500-generator-sets-operation-and-maintenance-manual.pdf")
+        # "Waukesha VGF": ("/Waukesha_VGF_f18g.pdf", "Waukesha_VGF_f18g.pdf"),
+        # "Powerpoint Example": ("/powerpoint.pptx", "powerpoint.pptx"),
+        # "Word Document Example": ("/word_doc_example.docx", "word_doc_example.docx")
+    }    
+    for title, (dropbox_path, local_filename) in docs.items():
+        local_path = os.path.join(os.getcwd(), local_filename)
         
-        for text, page in tqdm(text_chunks, desc=f"Indexing {manual}"):
-            #embedding = client.embeddings.create(input=text, model="text-embedding-3-small")
-            #vector = embedding.data[0].embedding
-            metadata = {"source": manual, "page": page}
-            #index.upsert(vectors=[(f"doc_{manual}_page_{page}", vector, metadata)])
-            docs.append((text, manual, page))
-        print(docs)
+        # Download file from Dropbox
+        download_file_from_dropbox(dropbox_path, local_path)
+
+        # Process the downloaded file
+        if local_filename.endswith(".pdf"):
+            text_chunks = extract_text_from_pdf(local_path)
+        elif local_filename.endswith(".pptx"):
+            text_chunks = extract_text_from_pptx(local_path)
+        elif local_filename.endswith(".docx"):
+            text_chunks = extract_text_from_docx(local_path)
+        else:
+            continue
+
+    for text in tqdm([text_chunks], desc=f"Indexing {title}"):
+        #embedding = client.embeddings.create(input=text, model="text-embedding-3-small")
+        #vector = embedding.data[0].embedding
+        metadata = {"source": title}
+        #index.upsert(vectors=[(f"doc_{manual}_page_{page}", vector, metadata)])
+        doc_text.append((text, title))
+    print("DOCCC", doc_text)
     
     print("Manuals chunked, vectorized, and upserted into Pinecone database.")
