@@ -79,7 +79,7 @@ def process_and_store_document(document_name: str, file_path: str):
 
     for i in range(0, len(vectors), 100):  # 100 vectors per upsert
         batch = vectors[i:i+100]
-        index.upsert(vectors=batch, namespace=document_name)
+        #index.upsert(vectors=batch, namespace=document_name)
 
 def query_document(document_name: str, query: str, top_k: int = 3) -> List[Dict]:
     """Query a specific document namespace in the vector DB"""

@@ -53,12 +53,12 @@ async def handle_query(request: QueryRequest):
         
         # Process document if not already in vector DB
         if not check_document_exists(request.document_name):
-            logger.info(f"Document {request.document_name} needs processing")
+            logger.info(f"Document {request.document_name} needs to be chunked, embedded and upserted to vector db.")
             file_path = download_file(request.document_name)
             logger.info(f"Downloaded to {file_path}, starting processing...")
             process_and_store_document(request.document_name, file_path)
             os.remove(file_path)  # Clean up downloaded file
-            logger.info("Processing complete, temporary file deleted")
+            logger.info("Processing complete, temporary file deleted.")
         else:
             logger.info("Document found in vector db.")
 
