@@ -27,7 +27,7 @@ def generate_response(query: str, context: str) -> str:
     return f"This is a mock response, query: {query}, context: {context}" #response.choices[0].message.content
 
 def process_query(document_name: str, query: str) -> Dict:
-    """Process a query against a specific document"""
+    """Run vector search of a query against a specific document and generate response"""
     # Get relevant chunks from vector DB
     chunks = query_document(document_name, query, top_k=3)
     
@@ -38,6 +38,7 @@ def process_query(document_name: str, query: str) -> Dict:
     answer = generate_response(query, context)
     
     return {
+        "query": query,
         "answer": answer,
         "source_document": document_name,
         "relevant_chunks": chunks
