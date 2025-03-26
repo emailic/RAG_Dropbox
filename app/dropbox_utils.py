@@ -15,7 +15,6 @@ def list_dropbox_files() -> List[str]:
     dbx = get_dropbox_client()
     try:
         response = dbx.files_list_folder("")
-        print("RESPONSESSSSSSS", response )
         return [entry.name for entry in response.entries]
     except Exception as e:
         print(f"Error listing Dropbox files: {e}")
