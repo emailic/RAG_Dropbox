@@ -58,7 +58,11 @@ def clear_pinecone_index(index):
 def download_file_from_dropbox(dropbox_path, local_path):
     """Download a file from Dropbox to a local directory"""
     dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
+
     
+    response = dbx.files_list_folder("")
+    print("RESPONSESSSSSSS", [entry.name for entry in response.entries] )
+
     #try:
     dbx.files_download_to_file(local_path, dropbox_path)
     print(f"Downloaded {dropbox_path} to {local_path}")
