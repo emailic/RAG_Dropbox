@@ -28,13 +28,11 @@ def generate_response(query: str, context: str) -> str | None:
 
 def process_query(document_name: str, query: str) -> Dict:
     """Run vector search of a query against a specific document and generate response"""
-    # Get relevant chunks from vector DB
+
     chunks = query_document(document_name, query, top_k=3)
     
-    # Combine chunks into context
     context = "\n\n".join([chunk['text'] for chunk in chunks])
     
-    # Generate answer
     answer = generate_response(query, context)
     
     return {

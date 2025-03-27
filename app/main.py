@@ -25,14 +25,13 @@ class DocumentResponse(BaseModel):
 
 @app.get("/documents", response_model=List[DocumentResponse])
 async def get_documents():
-    """List all PDF documents in Dropbox with their processing status"""
+    """List all PDF documents in Dropbox with their status of being stored in Pinecone"""
     try:
-        files = list_dropbox_files()
-        
+        files = list_dropbox_files() 
         documents = []
         for doc in files:
             processed = check_document_exists(doc)
-            documents.append({"name": doc, "processed": processed})
+            documents.append({"name": doc, "Stored in Pinecone?": processed})
         
         return documents
     except Exception as e:
@@ -44,26 +43,21 @@ async def handle_query(request: QueryRequest):
     try:
         logger.info(f"Starting query for document: {request.document_name}")
         
-        # Check if document exists in Dropbox
         logger.info("Listing Dropbox files...")
         files = list_dropbox_files()
         if request.document_name not in files:
             raise HTTPException(status_code=404, detail="Document not found in Dropbox")
     
-        
-        # Process document if not already in vector DB
         if not check_document_exists(request.document_name):
             logger.info(f"Document {request.document_name} needs to be chunked, embedded and upserted to vector db.")
             file_path = download_file(request.document_name)
             logger.info(f"Downloaded to {file_path}, starting processing...")
             process_and_store_document(request.document_name, file_path)
-            os.remove(file_path)  # Clean up downloaded file
+            os.remove(file_path)  
             logger.info("Processing complete, temporary file deleted.")
         else:
             logger.info("Document found in vector db.")
 
-        
-        # Process query
         logger.info("Starting query processing...")
         result = process_query(request.document_name, request.query)
         logger.info("Query processed successfully")

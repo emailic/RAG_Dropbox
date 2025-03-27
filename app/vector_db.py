@@ -28,7 +28,6 @@ def get_index():
             metric="cosine",
             spec=ServerlessSpec(cloud="aws", region="us-east-1")
         )
-        # Wait for index to be ready
     return pc.Index(INDEX_NAME)
 
 def check_document_exists(document_name: str) -> bool:
@@ -51,28 +50,18 @@ def process_and_store_document(document_name: str, file_path: str):
     else:
         raise HTTPException(status_code=400, detail="Unsupported file format. Only PDF and DOCX are supported.")
     logger.info(f"Extracted text from {document_name}.")
-
-    
-    # Chunk text
     logger.info("Chunking text...")
     chunks = chunk_text(corpus)
     logger.info(f"Created {len(chunks)} chunks")
-    
-    # Generate embeddings and store
     index = get_index()
     vectors = []
-
     logger.info("Generating embeddings...")
     for chunk in chunks:
-        # Generate embedding
         embedding = client.embeddings.create(
             input=chunk["text"],
             model="text-embedding-3-small"
         ).data[0].embedding
 
-        # embedding = [0.123] * 1536 #mock embedding
-        
-        # Prepare vector
         vector_id = f"{document_name}_chunk_{chunk['chunk_id']}"
         metadata = {
             "text": chunk["text"],
@@ -81,7 +70,6 @@ def process_and_store_document(document_name: str, file_path: str):
         
         vectors.append((vector_id, embedding, metadata))
     
-    # Upsert in batches
     logger.info("Upserting to vector database...")
 
     for i in range(0, len(vectors), 100):  # 100 vectors per upsert
@@ -101,20 +89,14 @@ def query_document(document_name: str, query: str, top_k: int = 3) -> List[Dict]
         input=query,
         model="text-embedding-3-small"
     ).data[0].embedding
-
-    # embedding = [0.123456789] * 1536 #mock embedding
     
-    # Query the specific document namespace
     results = index.query(
         vector=embedding,
-        # warning: if the document contains less then top_k chunks in pinecone, index.query is gonna return
-        # an empty list!
         top_k= top_k,
         namespace=document_name,
         include_metadata=True
     )
     
-    # Format results
     return [{
         "text": match.metadata["text"],
         "score": match.score
