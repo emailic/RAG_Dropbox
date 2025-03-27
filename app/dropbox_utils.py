@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from typing import List
 
-load_dotenv()
+load_dotenv(override=True)
 
 def get_dropbox_client():
     """Initialize Dropbox client"""
@@ -33,5 +33,5 @@ def download_file(filename: str) -> str:
         print(f"Error downloading file {filename}: {e}")
         raise
     
-# print (os.getenv("DROPBOX_ACCESS_TOKEN"))
-# a = list_dropbox_files()
+print(os.getenv("DROPBOX_ACCESS_TOKEN"))
+a = list_dropbox_files()

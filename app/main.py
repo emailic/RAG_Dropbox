@@ -28,10 +28,9 @@ async def get_documents():
     """List all PDF documents in Dropbox with their processing status"""
     try:
         files = list_dropbox_files()
-        pdf_files = [f for f in files if f.lower().endswith('.pdf')]
         
         documents = []
-        for doc in pdf_files:
+        for doc in files:
             processed = check_document_exists(doc)
             documents.append({"name": doc, "processed": processed})
         
@@ -50,6 +49,7 @@ async def handle_query(request: QueryRequest):
         files = list_dropbox_files()
         if request.document_name not in files:
             raise HTTPException(status_code=404, detail="Document not found in Dropbox")
+    
         
         # Process document if not already in vector DB
         if not check_document_exists(request.document_name):

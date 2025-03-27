@@ -3,7 +3,9 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 from typing import List, Dict
-from ocr_utils import extract_text_from_pdf, chunk_text
+from text_extraction_utils import extract_text_from_pdf,extract_text_from_docx, chunk_text
+from fastapi import HTTPException
+
 import time
 import logging
 
@@ -27,7 +29,6 @@ def get_index():
             spec=ServerlessSpec(cloud="aws", region="us-east-1")
         )
         # Wait for index to be ready
-        time.sleep(1)
     return pc.Index(INDEX_NAME)
 
 def check_document_exists(document_name: str) -> bool:
@@ -41,8 +42,14 @@ def process_and_store_document(document_name: str, file_path: str):
     logger.info(f"Starting processing for {document_name}")
 
     # Extract text
-    logger.info("Extracting text from PDF...")
-    corpus = extract_text_from_pdf(file_path)
+    if document_name.lower().endswith('.pdf'):
+        logger.info("Extracting text from PDF document...")
+        corpus = extract_text_from_pdf(file_path)
+    elif document_name.lower().endswith('.docx'):
+        logger.info("Extracting text from DOCX document...")
+        corpus = extract_text_from_docx(file_path)
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported file format. Only PDF and DOCX are supported.")
     logger.info(f"Extracted text from {document_name}.")
 
     
@@ -81,11 +88,14 @@ def process_and_store_document(document_name: str, file_path: str):
         batch = vectors[i:i+100]
         index.upsert(vectors=batch, namespace=document_name)
 
+    # because at the first run of the app.post("/query"), if the document isn't in db yet 
+    # the chunks arent retrieved. Likely because of latency
+    time.sleep(10) 
+
 def query_document(document_name: str, query: str, top_k: int = 3) -> List[Dict]:
     """Query a specific document namespace in the vector DB"""
     index = get_index()
     
-    # Generate query embedding
 
     embedding = client.embeddings.create(
         input=query,
@@ -97,7 +107,9 @@ def query_document(document_name: str, query: str, top_k: int = 3) -> List[Dict]
     # Query the specific document namespace
     results = index.query(
         vector=embedding,
-        top_k=top_k,
+        # warning: if the document contains less then top_k chunks in pinecone, index.query is gonna return
+        # an empty list!
+        top_k= top_k,
         namespace=document_name,
         include_metadata=True
     )
