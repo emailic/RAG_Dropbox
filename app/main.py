@@ -31,7 +31,7 @@ async def get_documents():
         documents = []
         for doc in files:
             processed = check_document_exists(doc)
-            documents.append({"name": doc, "Stored in Pinecone?": processed})
+            documents.append({"name": doc, "processed": processed})
         
         return documents
     except Exception as e:
