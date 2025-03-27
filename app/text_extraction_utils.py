@@ -76,12 +76,6 @@ def extract_text_from_pdf(pdf_path: str) -> str:
 def extract_text_from_docx(docx_path: str) -> str:
     """
     Extract text from DOCX, using OCR if needed.
-    
-    Args:
-        docx_path (str): Path to the DOCX file
-    
-    Returns:
-        str: Extracted text from the DOCX
     """
     texts = []
     images = []
@@ -133,8 +127,7 @@ def chunk_text(corpus: str, chunk_size: int = 1000) -> List[Dict]:
     Chunk text into smaller pieces with metadata.
     """
     chunks = []
-
-    # Chunking by splitting on paragraphs
+    # paragraph based chunking
     paragraphs = [p for p in corpus.split('\n') if p.strip()]
     current_chunk = ""
     
