@@ -157,7 +157,7 @@ def extract_images_from_pptx(pptx_path: str, temp_dir: str) -> List[str]:
 
 def extract_text_from_pptx(pptx_path: str) -> str:
     """
-    Extract text from PowerPoint file, using OCR if needed.
+    Extract text from PowerPoint file, using OCR for image-based slides.
     """
     texts = []
     images = []
