@@ -157,4 +157,4 @@ def chunk_text(corpus: str, chunk_size: int = 1000) -> List[Dict]:
     return chunks
     
 
-print(chunk_text(extract_text_from_docx("OCR_example.docx")))
+# print(chunk_text(extract_text_from_docx("OCR_example.docx")))
