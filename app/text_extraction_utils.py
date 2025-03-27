@@ -150,7 +150,7 @@ def extract_images_from_pptx(pptx_path: str, temp_dir: str) -> List[str]:
                     
                     images.append(image_path)
     except Exception as e:
-        print(f"Error extracting images from PowerPoint: {e}")
+        logger.error(f"Error extracting images from PowerPoint: {e}")
     
     return images
 
@@ -166,6 +166,7 @@ def extract_text_from_pptx(pptx_path: str) -> str:
     try:
         # Try regular text extraction
         prs = pptx.Presentation(pptx_path)
+        logger.info("Attempting regular text extraction from PowerPoint...")
         
         # Extract text from slides
         for slide in prs.slides:
@@ -199,7 +200,7 @@ def extract_text_from_pptx(pptx_path: str) -> str:
                     print(f"Error processing image {image_path}: {img_err}")
     
     except Exception as e:
-        print(f"Error extracting text from PowerPoint: {e}")
+        logger.error(f"Error extracting text from PowerPoint: {e}")
     
     finally:
         # Cleanup temporary files and directory
@@ -210,11 +211,11 @@ def extract_text_from_pptx(pptx_path: str) -> str:
             try:
                 shutil.rmtree(temp_dir)
             except Exception as cleanup_err:
-                print(f"Error during cleanup: {cleanup_err}")
+                logger.error(f"Error during cleanup: {cleanup_err}")
     
+    # Combine and return all extracted texts
     corpus = "\n".join(texts)
     return corpus
-
 
 def chunk_text(corpus: str, chunk_size: int = 1000) -> List[Dict]:
     """
@@ -243,5 +244,4 @@ def chunk_text(corpus: str, chunk_size: int = 1000) -> List[Dict]:
 
     return chunks
     
-
-print(chunk_text(extract_text_from_pptx("Abstract.pptx")))
+print(chunk_text(extract_text_from_pptx("example.pptx")))
