@@ -3,7 +3,9 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 from typing import List, Dict
-from ocr_utils import extract_text_from_pdf, chunk_text
+from app.text_extraction_utils import extract_text_from_pdf,extract_text_from_docx, chunk_text
+from fastapi import HTTPException
+
 import time
 import logging
 
@@ -41,8 +43,14 @@ def process_and_store_document(document_name: str, file_path: str):
     logger.info(f"Starting processing for {document_name}")
 
     # Extract text
-    logger.info("Extracting text from PDF...")
-    corpus = extract_text_from_pdf(file_path)
+    if document_name.lower().endswith('.pdf'):
+        logger.info("Extracting text from PDF document...")
+        corpus = extract_text_from_pdf(file_path)
+    elif document_name.lower().endswith('.docx'):
+        logger.info("Extracting text from DOCX document...")
+        corpus = extract_text_from_docx(file_path)
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported file format. Only PDF and DOCX are supported.")
     logger.info(f"Extracted text from {document_name}.")
 
     
