@@ -131,13 +131,6 @@ def extract_text_from_docx(docx_path: str) -> str:
 def chunk_text(corpus: str, chunk_size: int = 1000) -> List[Dict]:
     """
     Chunk text into smaller pieces with metadata.
-    
-    Args:
-        corpus (str): Text to be chunked
-        chunk_size (int, optional): Maximum size of each chunk. Defaults to 1000.
-    
-    Returns:
-        List[Dict]: List of text chunks with chunk_id
     """
     chunks = []
 
@@ -162,30 +155,6 @@ def chunk_text(corpus: str, chunk_size: int = 1000) -> List[Dict]:
         })
 
     return chunks
-
-
-def process_document(file_path: str):
-    """
-    Process a document and extract text chunks.
-    """
-    try:
-        # Determine file type and call appropriate extraction method
-        file_ext = os.path.splitext(file_path)[1].lower()
-        
-        if file_ext == '.pdf':
-            text = extract_text_from_pdf(file_path)
-        elif file_ext == '.docx':
-            text = extract_text_from_docx(file_path)
-        else:
-            raise ValueError(f"Unsupported file type: {file_ext}")
-        
-        # Chunk the extracted text
-        chunks = chunk_text(text)
-        return chunks
-    
-    except Exception as e:
-        print(f"Error processing document {file_path}: {e}")
-        return []
     
 
-print(chunk_text(extract_text_from_docx("example03.docx")))
+print(chunk_text(extract_text_from_docx("OCR_example.docx")))
