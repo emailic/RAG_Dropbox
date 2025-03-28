@@ -3,7 +3,7 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 from typing import List, Dict
-from text_extraction_utils import extract_text_from_pdf,extract_text_from_docx, extract_text_from_pptx, chunk_text
+from app.text_extraction_utils import extract_text_from_pdf,extract_text_from_docx, extract_text_from_pptx, chunk_text
 from fastapi import HTTPException
 
 import time
