@@ -2,15 +2,52 @@
 
 ## Overview
 
-This API, which is a backend for an application, provides a Retrieval-Augmented Generation (RAG) system integrated with Dropbox. It allows users to query documents stored in Dropbox using natural language, with responses generated based on the document content. The system processes documents by extracting text, chunking it, generating embeddings, and storing them in Pinecone vector database for efficient retrieval.
+This API, which could be a backend for an application, provides a Retrieval-Augmented Generation (RAG) system integrated with Dropbox. It allows users to query documents stored in Dropbox using natural language, with responses generated based on the document content. The system processes documents by extracting text, chunking it, generating embeddings, and storing them in Pinecone vector database for efficient retrieval.
 
-## Features
+## Architecture and Repository Structure
 
-- **Document Management**: List and process documents from Dropbox
-- **Text Extraction**: Supports PDF, DOCX, and PPT/PPTX files with OCR fallback
-- **Vector Storage**: Stores document chunks in Pinecone for efficient retrieval
-- **Query Processing**: Answers natural language questions about documents
-- **API Interface**: FastAPI backend for easy integration
+```
+RAG_Dropbox/
+│
+├── app/                          # Main application directory
+│   ├── __pycache__               # Cache
+│   ├── main.py                   # FastAPI application and routes
+│   ├── rag.py                    # RAG query processing logic
+│   ├── dropbox_utils.py          # Dropbox API interactions
+│   ├── vector_db.py              # Pinecone vector database operations
+│   └── text_extraction_utils.py  # Document text extraction utilities
+│
+├── .env                          # Environment variables (gitignored)
+├── .gitignore                    # Git ignore rules
+├── poetry.lock                   # Prevents automatic dependency updates
+├── pyproject.toml                # Poetry dependencies
+└── README.md                     # This documentation
+```
+
+### Key Architectural Components:
+
+1. **API Layer** (`main.py`):
+   - FastAPI endpoints for document listing and querying
+   - Request/response models and error handling
+
+2. **RAG Core** (`rag.py`):
+   - Query processing pipeline
+   - Context generation and OpenAI call
+   - Response formatting
+
+3. **Document Processing** (`text_extraction_utils.py`):
+   - Multi-format text extraction (PDF, DOCX, PPTX)
+   - OCR fallback system
+   - Text chunking
+
+4. **Storage Integrations**:
+   - Dropbox (`dropbox_utils.py`)
+   - Pinecone vector database (`vector_db.py`)
+
+5. **Supporting Infrastructure**:
+   - Environment configuration (`.env`)
+   - Dependency management (`pyproject.toml`)
+
 
 ## Prerequisites
 
@@ -169,7 +206,7 @@ This led to our dual-phase processing strategy:
 - Faster processing for text-based documents
 - Automatic handling of mixed-content documents
 
-### Known Limitations
+### Known Limitations & Notes
 
 1. **PowerPoint Image Extraction**:
    - Current implementation cannot extract text from images embedded in PowerPoint files
@@ -184,31 +221,31 @@ This led to our dual-phase processing strategy:
     - If the files contain both text and images from which text should be extracted, our system will only extract text.
     - The naive solution would be to simply extract text from all files using OCR but we decided to go with a more sophisticated approach (Dual-phase processing strategy presented above)
 
-## Notes
-
-1. **Performance Considerations**:
+4. **Performance Considerations**:
    - The first query for a document will be slower as it needs to process the document
    - Subsequent queries will be faster as they use the pre-processed embeddings
    - Document processing includes a 10-second delay to ensure Pinecone availability
 
-2. **File Support**:
+5. **File Support**:
    - Currently supports PDF, DOCX, and PPT/PPTX files
    - PDFs with scanned images will be processed using OCR
    - Complex PowerPoint files may have limited text extraction accuracy
 
-3. **Temporary Files**:
+6. **Temporary Files**:
    - Downloaded files are stored in a `temp_downloads` directory
    - These files are automatically deleted after processing
 
-4. **Additional Dependencies**:
-   - For optimal PDF processing, ensure `poppler-utils` is installed
+7. **Additional Dependencies**:
+   - For successful PDF processing, ensure `poppler-utils` is installed
 
-## Development
+8. **`shape.type` not implemented**
+   - This method from `pptx` package plays a crucial role in extracting images from powerpoints. Upon further inspection, it looks like its not implemented in the original package, which might be the root of the issue on why it was so hard to extract images from slides. 
 
-To run the application in development mode with auto-reload:
-```bash
-uvicorn app.main:app --reload
-```
+9. **No tests**
+   - Due to time constraits, unit and integration tests were not implemented.
+
+10. **No Front End**
+   - Due to time constraints, front end was not implemented.
 
 ## Testing
 
