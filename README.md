@@ -181,7 +181,7 @@ This led to our dual-phase processing strategy:
    - OCR quality depends on image clarity and resolution
 
 3. **Mixed Image and Text Files**
-    - If the files contain both text nad images from which text should be extracted, our system will only extract text.
+    - If the files contain both text and images from which text should be extracted, our system will only extract text.
     - The naive solution would be to simply extract text from all files using OCR but we decided to go with a more sophisticated approach (Dual-phase processing strategy presented above)
 
 ## Notes
