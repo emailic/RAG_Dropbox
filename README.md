@@ -10,7 +10,6 @@ This API, which could be a backend for an application, provides a Retrieval-Augm
 RAG_Dropbox/
 │
 ├── app/                          # Main application directory
-│   ├── __pycache__               # Cache
 │   ├── main.py                   # FastAPI application and routes
 │   ├── rag.py                    # RAG query processing logic
 │   ├── dropbox_utils.py          # Dropbox API interactions
