@@ -1,7 +1,7 @@
 import os
 from openai import OpenAI
 from typing import Dict, List
-from vector_db import query_document
+from app.vector_db import query_document
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 

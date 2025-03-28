@@ -3,9 +3,9 @@ from pydantic import BaseModel
 from typing import List, Optional
 import os
 from dotenv import load_dotenv
-from rag import process_query
-from dropbox_utils import list_dropbox_files, download_file
-from vector_db import check_document_exists, process_and_store_document
+from app.rag import process_query
+from app.dropbox_utils import list_dropbox_files, download_file
+from app.vector_db import check_document_exists, process_and_store_document
 import logging
 
 logging.basicConfig(level=logging.INFO)
