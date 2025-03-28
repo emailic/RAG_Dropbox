@@ -201,14 +201,10 @@ This led to our dual-phase processing strategy:
    - These files are automatically deleted after processing
 
 4. **Additional Dependencies**:
-   - For optimal PDF processing, ensure `poppler-utils` is installed
+   - For successful PDF processing, ensure `poppler-utils` is installed
 
-## Development
-
-To run the application in development mode with auto-reload:
-```bash
-uvicorn app.main:app --reload
-```
+5. **`shape.type` not implemented**
+   - This method from `pptx` package plays a crucial role in extracting images from powerpoints. Upon further inspection, it looks like its not implemented in the original package, which might be the root of the issue on why it was so hard to extract images from slides. 
 
 ## Testing
 

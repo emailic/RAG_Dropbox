@@ -14,7 +14,6 @@ def generate_response(query: str, context: str) -> str | None:
     
     Question: {query}
     Answer:"""
-    
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
