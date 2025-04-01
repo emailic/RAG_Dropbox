@@ -7,6 +7,9 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_response(query: str, context: str) -> str | None:
     """Generate answer using OpenAI based on retrieved context"""
+    if not context:
+        return "No relevant excerpts were retrieved from the document, hence I can't answer your query." 
+    
     prompt = f"""Use the following context from the document to answer the question regarding the document. 
     If you don't know the answer, say you don't know.
     
@@ -22,7 +25,6 @@ def generate_response(query: str, context: str) -> str | None:
         ],
         temperature=0
     )
-    
     return response.choices[0].message.content
 
 def process_query(document_name: str, query: str) -> Dict:
@@ -41,4 +43,4 @@ def process_query(document_name: str, query: str) -> Dict:
         "relevant_chunks": chunks
     }
 
-#print(process_query("Caterpillar-3500-generator-sets-operation-and-maintenance-manual.pdf", "what kind of macine is this?"))
+#print(process_query("corrupted.pdf", "what is this document about?"))
