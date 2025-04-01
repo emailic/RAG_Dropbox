@@ -29,7 +29,7 @@ RAG_Dropbox/
    - FastAPI endpoints for document listing and querying
    - Request/response models and error handling
 
-2. **RAG Core** (`rag.py`):
+2. **RAG** (`rag.py`):
    - Query processing pipeline
    - Context generation and OpenAI call
    - Response formatting
