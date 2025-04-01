@@ -217,7 +217,7 @@ This led to our dual-phase processing strategy:
    - OCR quality depends on image clarity and resolution
 
 3. **Mixed Image and Text Files**
-    - If the files contain both text nad images from which text should be extracted, our system will only extract text.
+    - If the files contain both text and images from which text should be extracted, our system will only extract text.
     - The naive solution would be to simply extract text from all files using OCR but we decided to go with a more sophisticated approach (Dual-phase processing strategy presented above)
 
 4. **Performance Considerations**:
@@ -237,8 +237,10 @@ This led to our dual-phase processing strategy:
 7. **Additional Dependencies**:
    - For successful PDF processing, ensure `poppler-utils` is installed
 
-8. **`shape.type` Not Implemented**
-   - This method from `pptx` package plays a crucial role in extracting images from powerpoints. Upon further inspection, it looks like its not implemented in the original package, which might be the root of the issue on why it was so hard to extract images from slides. 
+8. **`shape.type` not implemented**
+   - This method from `pptx` package plays a crucial role in extracting images from powerpoints. Upon further inspection, it looks like its not implemented in the original package, which might be the root of the issue on why it was so hard to extract images from slides.
+   - [This](https://stackoverflow.com/questions/52491656/extracting-images-from-presentation-file) might be a good alternative proposal for extracting images from powerpoint, but due to time constraints didn't get time to try it out. 
+
 9. **Chunking**
    - Chunking is implemented in a way for it to continue concatenating paragraphs until they exceed 1000 characters, but if a single paragraph is longer than 1000 characters, it will become a single chunk. 
 
