@@ -178,9 +178,10 @@ Query a specific document.
    - Text is chunked into manageable pieces (≈1000 characters)
 
 2. **Vector Storage**:
-   - Chunks are converted to embeddings using OpenAI's text-embedding-3-small
+   - Chunks are converted to embeddings using OpenAI's text-embedding-3-small. 
    - Embeddings are stored in Pinecone with document names as namespaces
    - Each document maintains its own namespace in the vector database
+   - Pinecone was chosen  because it is a database optimized for retrieval, is simple to use, and it integrates well with some cloud services providers like GCP
 
 3. **Query Processing**:
    - Queries are converted to embeddings using the same model
@@ -242,7 +243,7 @@ This led to our dual-phase processing strategy:
    - [This](https://stackoverflow.com/questions/52491656/extracting-images-from-presentation-file) might be a good alternative proposal for extracting images from powerpoint, but due to time constraints didn't get time to try it out. 
 
 9. **Chunking**
-   - Chunking is implemented in a way for it to continue concatenating paragraphs until they exceed 1000 characters, but if a single paragraph is longer than 1000 characters, it will become a single chunk. 
+   - Chunking is implemented in a way for it to continue concatenating paragraphs until they exceed 1000 characters, but if a single paragraph is longer than 1000 characters, it will become a single chunk. In a real-world scenario, I would recommend recusrive chunking with overlap. 
 
 10. **No Tests**
    - Due to time constraits, unit and integration tests were not implemented.
@@ -253,16 +254,16 @@ This led to our dual-phase processing strategy:
 
 ## Testing
 
-You can test the API endpoints using FastAPI's built-in docs interface at `http://localhost:8000/docs`
+You can test the API endpoints using FastAPI's built-in docs interface at `http://127.0.0.1:8000/docs`
 
 ## Future Improvements
 
 1. Add support for more file types (e.g., TXT, HTML)
 2. Implement document versioning
 3. Add user authentication
-4. Improve OCR accuracy with advanced preprocessing
+4. Improve OCR on Powerpoint
 5. Add batch processing for multiple documents
-6. Pinecone namespaces should be named as document ID
+6. Name Pinecone namespaces as document ID
 
 ## Troubleshooting
 
