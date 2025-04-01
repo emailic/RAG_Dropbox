@@ -7,7 +7,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_response(query: str, context: str) -> str | None:
     """Generate answer using OpenAI based on retrieved context"""
-    prompt = f"""Use the following context to answer the question. 
+    prompt = f"""Use the following context from the document to answer the question regarding the document. 
     If you don't know the answer, say you don't know.
     
     Context: {context}
@@ -17,7 +17,7 @@ def generate_response(query: str, context: str) -> str | None:
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "system", "content": "You are a helpful assistant who answers questions based on the context extracted from the document."},
             {"role": "user", "content": prompt}
         ],
         temperature=0
