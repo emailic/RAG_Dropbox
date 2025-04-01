@@ -237,14 +237,17 @@ This led to our dual-phase processing strategy:
 7. **Additional Dependencies**:
    - For successful PDF processing, ensure `poppler-utils` is installed
 
-8. **`shape.type` not implemented**
+8. **`shape.type` Not Implemented**
    - This method from `pptx` package plays a crucial role in extracting images from powerpoints. Upon further inspection, it looks like its not implemented in the original package, which might be the root of the issue on why it was so hard to extract images from slides. 
+9. **Chunking**
+   - Chunking is implemented in a way for it to continue concatenating paragraphs until they exceed 1000 characters, but if a single paragraph is longer than 1000 characters, it will become a single chunk. 
 
-9. **No tests**
+10. **No Tests**
    - Due to time constraits, unit and integration tests were not implemented.
 
-10. **No Front End**
+11. **No Front End**
    - Due to time constraints, front end was not implemented.
+
 
 ## Testing
 

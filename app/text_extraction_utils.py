@@ -42,7 +42,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
 
 def extract_images_from_docx(docx_path: str, temp_dir: str) -> List[str]:
     """
-    Extract images from a DOCX file and save them to a temporary directory.
+    Extract images from a DOCX file and save the paths to a temporary directory.
     """
     images = []
     try:
@@ -152,7 +152,8 @@ def extract_text_from_pptx(pptx_path: str) -> str:
         for slide in prs.slides:
             # extract text from text boxes
             for shape in slide.shapes:
-                if hasattr(shape, "text"):
+                # if shape has attribute "text"
+                if hasattr(shape, "text"): # we could have also used has_text_frame by pptx
                     text = shape.text.strip()
                     if text:
                         texts.append(text)
@@ -197,7 +198,7 @@ def extract_text_from_pptx(pptx_path: str) -> str:
 
 def chunk_text(corpus: str, chunk_size: int = 1000) -> List[Dict]:
     """
-    Chunk text into smaller pieces with metadata before storing in .
+    Chunk text into smaller pieces with metadata before storing in pinecone.
     """
     chunks = []
     # paragraph based chunking
@@ -222,4 +223,4 @@ def chunk_text(corpus: str, chunk_size: int = 1000) -> List[Dict]:
 
     return chunks
     
-print(chunk_text(extract_text_from_pptx("example.pptx")))
+#print(chunk_text(extract_text_from_pptx("example.pptx")))
