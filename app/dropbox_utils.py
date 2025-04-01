@@ -33,5 +33,5 @@ def download_file(filename: str) -> str:
         print(f"Error downloading file {filename}: {e}")
         raise
     
-print(os.getenv("DROPBOX_ACCESS_TOKEN"))
-a = list_dropbox_files()
+# print(os.getenv("DROPBOX_ACCESS_TOKEN"))
+# a = list_dropbox_files()
