@@ -238,7 +238,8 @@ This led to our dual-phase processing strategy:
    - For successful PDF processing, ensure `poppler-utils` is installed
 
 8. **`shape.type` not implemented**
-   - This method from `pptx` package plays a crucial role in extracting images from powerpoints. Upon further inspection, it looks like its not implemented in the original package, which might be the root of the issue on why it was so hard to extract images from slides. 
+   - This method from `pptx` package plays a crucial role in extracting images from powerpoints. Upon further inspection, it looks like its not implemented in the original package, which might be the root of the issue on why it was so hard to extract images from slides.
+   - [This](https://stackoverflow.com/questions/52491656/extracting-images-from-presentation-file) might be a good alternative proposal for extracting images from powerpoint, but due to time constraints didn't get time to try it out.  
 
 9. **No tests**
    - Due to time constraits, unit and integration tests were not implemented.
